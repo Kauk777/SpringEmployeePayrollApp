@@ -16,24 +16,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bridgelabz.employeepayroll.models.EmployeeDO;
+import com.bridgelabz.employeepayroll.models.EmployeeEntity;
 import com.bridgelabz.employeepayroll.models.ResponseDAO;
 import com.bridgelabz.employeepayroll.service.IEmployeePayrollService;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {"http://localhost:3000","http://localhost:8080"})
 public class EmployeePayrollController {
 	
 	@Autowired
 	private IEmployeePayrollService employeePayrollService;
 	
-	 @GetMapping(value = {"", "/", "/get"})
-	 public ResponseEntity<String> getEmployeePayrollData() {
-	        return new ResponseEntity<String>("Employee Data ", HttpStatus.OK);
-	 }
+	
 	 
-	 @GetMapping(value="/list")
-	 public ResponseEntity<List<EmployeeDO>> getEmployeeList() {
-		 return new ResponseEntity<List<EmployeeDO>>(employeePayrollService.getEmployeeList(),HttpStatus.OK);
+	 @GetMapping(value="/get")
+	 public ResponseEntity<List<EmployeeEntity>> getEmployeeList() {
+		 return new ResponseEntity<List<EmployeeEntity>>(employeePayrollService.getEmployeeList(),HttpStatus.OK);
 	 }
 	 
 	 @PostMapping(value = "/add")
@@ -41,12 +39,12 @@ public class EmployeePayrollController {
 		 return new ResponseEntity<ResponseDAO>(employeePayrollService.addEmployee(employeeDO), HttpStatus.OK);
 	 }
 	 
-	 @DeleteMapping(value = "/{id}")
+	 @DeleteMapping(value = "/delete/{id}")
 	    public ResponseEntity<ResponseDAO> deleteEmplyoee(@PathVariable int id) {
 	        return new ResponseEntity<ResponseDAO>(employeePayrollService.deleteEmployee(id), HttpStatus.OK);
 	 }
 	 
-	 @GetMapping(value = "/{id}")
+	 @GetMapping(value = "/get/{id}")
 	    public ResponseEntity<EmployeeDO> getEmployeeById(@PathVariable int id) {
 	        return new ResponseEntity<EmployeeDO>(employeePayrollService.getEmployeeByID(id), HttpStatus.OK);
 	 }

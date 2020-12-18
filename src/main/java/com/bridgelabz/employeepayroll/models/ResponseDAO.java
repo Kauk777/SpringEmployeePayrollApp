@@ -5,7 +5,6 @@ public class ResponseDAO {
 	private String message;
 
 	public ResponseDAO(String message) {
-		super();
 		this.message = message;
 	}
 	public String getMessage() {

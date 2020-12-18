@@ -2,6 +2,7 @@ package com.bridgelabz.employeepayroll.models;
 
 
 public class EmployeeDO {
+	public int id;
 	public String name;
 	public String gender;
 	public String department;
@@ -9,6 +10,15 @@ public class EmployeeDO {
 	public String startDate;
 	public String imgPath;
 	public String notes;
+	
+	public int getId() {
+		return id;
+	}
+
+
+	public void setId(int id) {
+		this.id = id;
+	}
 	
 	
 	public String getName() {

@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.bridgelabz.employeepayroll.exception.BadRequestException;
 import com.bridgelabz.employeepayroll.exception.NotFoundException;
 import com.bridgelabz.employeepayroll.models.EmployeeDO;
 import com.bridgelabz.employeepayroll.models.ResponseDAO;
@@ -24,12 +25,15 @@ public class EmployeePayrollServiceImpl implements IEmployeePayrollService{
 
 	@Override
 	public ResponseDAO addEmployee(EmployeeDO employeeRequestDAO) {
+		if (employeeRequestDAO == null) {
+			throw new BadRequestException("Name is not Proper");
+		}
 		EmployeeEntity empEntity=new EmployeeEntity();
 		empEntity.setName(employeeRequestDAO.getName());
 		empEntity.setGender(employeeRequestDAO.getGender());
 		empEntity.setImgPath(employeeRequestDAO.getImgPath());
 		empEntity.setNotes(employeeRequestDAO.getNotes());
-		empEntity.setStartDate(employeeRequestDAO.getStartDate());
+		empEntity.setStartDate("");
 		empEntity.setSalary(employeeRequestDAO.getSalary());
 		empEntity.setDepartment(employeeRequestDAO.getDepartment());
 		empEntity = employeeRepository.save(empEntity);
@@ -41,15 +45,16 @@ public class EmployeePayrollServiceImpl implements IEmployeePayrollService{
 	}
 
 	@Override
-	public List<EmployeeDO> getEmployeeList() {
-		List<EmployeeEntity> empList=employeeRepository.findAll();
+	public List<EmployeeEntity> getEmployeeList() {
+		return employeeRepository.findAll();
+		/*List<EmployeeEntity> empList=employeeRepository.findAll();
 		if(empList==null || empList.isEmpty()) {
 			throw new NotFoundException("No Data Found of any employee");
 		}
 		return empList.stream().map(employee -> {
 			EmployeeDO emp = convertobj(employee);
 			return emp;
-		}).collect(Collectors.toList());
+		}).collect(Collectors.toList());*/
 			
 	}
 	
@@ -89,6 +94,7 @@ public class EmployeePayrollServiceImpl implements IEmployeePayrollService{
 	
 	private EmployeeDO convertobj(EmployeeEntity employee) {
 		EmployeeDO emp = new EmployeeDO();
+		emp.setId(employee.getId());
 		emp.setName(employee.getName());
 		emp.setDepartment(employee.getDepartment());
 		emp.setSalary(employee.getSalary());
