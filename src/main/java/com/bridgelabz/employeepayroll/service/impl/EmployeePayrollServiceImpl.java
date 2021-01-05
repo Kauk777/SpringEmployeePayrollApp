@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 
 import com.bridgelabz.employeepayroll.exception.BadRequestException;
 import com.bridgelabz.employeepayroll.exception.NotFoundException;
-import com.bridgelabz.employeepayroll.models.EmployeeDO;
-import com.bridgelabz.employeepayroll.models.ResponseDAO;
+import com.bridgelabz.employeepayroll.models.EmployeeDTO;
+import com.bridgelabz.employeepayroll.models.ResponseDTO;
 import com.bridgelabz.employeepayroll.models.EmployeeEntity;
 import com.bridgelabz.employeepayroll.repository.EmployeeRepository;
 import com.bridgelabz.employeepayroll.service.IEmployeePayrollService;
@@ -19,90 +19,72 @@ import com.bridgelabz.employeepayroll.service.IEmployeePayrollService;
 @Service
 public class EmployeePayrollServiceImpl implements IEmployeePayrollService{
 	
-	@Autowired
-	private EmployeeRepository employeeRepository;
+	 @Autowired
+	  private EmployeeRepository employeeRepository;
 
+	  @Override
+	  public ResponseDTO addEmployee(EmployeeDTO employeeDTO) {
+	    if (employeeDTO == null) {
+	      throw new BadRequestException("Name is not Proper");
+	    }
+	    EmployeeEntity empEntity = new EmployeeEntity();
+	    empEntity = this.convertEntity(empEntity, employeeDTO);
+	    empEntity = employeeRepository.save(empEntity);
+	    if (empEntity != null) {
+	      return new ResponseDTO("successfully inserted !!!!");
+	    } else {
+	      return new ResponseDTO("not success");
+	    }
+	  }
 
-	@Override
-	public ResponseDAO addEmployee(EmployeeDO employeeRequestDAO) {
-		if (employeeRequestDAO == null) {
-			throw new BadRequestException("Name is not Proper");
-		}
-		EmployeeEntity empEntity=new EmployeeEntity();
-		empEntity.setName(employeeRequestDAO.getName());
-		empEntity.setGender(employeeRequestDAO.getGender());
-		empEntity.setImgPath(employeeRequestDAO.getImgPath());
-		empEntity.setNotes(employeeRequestDAO.getNotes());
-		empEntity.setStartDate("");
-		empEntity.setSalary(employeeRequestDAO.getSalary());
-		empEntity.setDepartment(employeeRequestDAO.getDepartment());
-		empEntity = employeeRepository.save(empEntity);
-		if(empEntity != null) {
-			return new ResponseDAO("Success");
-		} else {
-			return new ResponseDAO("Failed");
-		}
-	}
+	  @Override
+	  public List<EmployeeEntity> getEmployeeList() {
+	    return employeeRepository.findAll();
+	  }
 
-	@Override
-	public List<EmployeeEntity> getEmployeeList() {
-		return employeeRepository.findAll();
-		/*List<EmployeeEntity> empList=employeeRepository.findAll();
-		if(empList==null || empList.isEmpty()) {
-			throw new NotFoundException("No Data Found of any employee");
-		}
-		return empList.stream().map(employee -> {
-			EmployeeDO emp = convertobj(employee);
-			return emp;
-		}).collect(Collectors.toList());*/
-			
-	}
-	
-	@Override
-	public ResponseDAO deleteEmployee(int id) {
-		employeeRepository.deleteById(id);
-		return new ResponseDAO("Employee Deleteed Successfully..!!");
-	}
-	
-	@Override
-	public EmployeeDO getEmployeeByID(int id) {
-		EmployeeEntity employee = employeeRepository.findById(id);
-		if(employee == null) {
-			throw new NotFoundException("No Data Found for the id:"+id);
-		}
-		EmployeeDO emp = convertobj(employee);
-		return emp;
-	}
-	
-	@Override
-	public EmployeeDO updateEmployeeById(EmployeeDO empData, int id) {
-		EmployeeEntity employeeEntity=employeeRepository.findById(id);
-		employeeEntity.setName(empData.getName());
-		employeeEntity.setDepartment(empData.getDepartment());
-		employeeEntity.setSalary(empData.getSalary());
-		employeeEntity.setImgPath(empData.getImgPath());
-		employeeEntity.setGender(empData.getGender());
-		employeeEntity.setNotes(empData.getNotes());
-		employeeEntity.setStartDate(empData.getStartDate());
-		employeeEntity=employeeRepository.save(employeeEntity);
-		if(employeeEntity == null) {
-			throw new NotFoundException("No Data Found for the id:"+id);
-		}
-		EmployeeDO emp=convertobj(employeeEntity);
-		return emp;
-	}
-	
-	private EmployeeDO convertobj(EmployeeEntity employee) {
-		EmployeeDO emp = new EmployeeDO();
-		emp.setId(employee.getId());
-		emp.setName(employee.getName());
-		emp.setDepartment(employee.getDepartment());
-		emp.setSalary(employee.getSalary());
-		emp.setGender(employee.getGender());
-		emp.setImgPath(employee.getImgPath());
-		emp.setStartDate("");
-		emp.setNotes(employee.getNotes());
-		return emp;
-	}
+	  @Override
+	  public ResponseDTO deleteEmployee(int id) {
+	    employeeRepository.deleteById(id);
+	    return new ResponseDTO("Deleted successfully");
+	  }
+
+	  @Override
+	  public EmployeeEntity findEmployee(int id) {
+	    return employeeRepository.findById(id)
+	        .orElseThrow(() -> new NotFoundException("User not found with this Id: " + id));
+	  }
+
+	  @Override
+	  public EmployeeEntity updateEmployeeData(int employeeId, EmployeeDTO employeeDTO) {
+	    EmployeeEntity employeeEntity = employeeRepository.findById(employeeId)
+	        .orElseThrow(() -> new NotFoundException("User not found with this Id: " + employeeId));
+	    employeeEntity = this.convertEntity(employeeEntity, employeeDTO);
+	    employeeEntity.setId(employeeId);
+	    return employeeRepository.save(employeeEntity);
+	  }
+
+	  private EmployeeDTO convertObj(EmployeeEntity employee) {
+	    EmployeeDTO employeeDTO = new EmployeeDTO();
+	    employeeDTO.setName(employee.getName());
+	    employeeDTO.setGender(employee.getGender());
+	    employeeDTO.setImagePath(employee.getImagePath());
+	    employeeDTO.setDepartment(employee.getDepartment());
+	    employeeDTO.setSalary(employee.getSalary());
+	    employeeDTO.setNotes(employee.getNotes());
+	    employeeDTO.setStartDate("");
+	    return employeeDTO;
+	  }
+
+	  private EmployeeEntity convertEntity(EmployeeEntity empEntity, EmployeeDTO empDo) {
+	    empEntity.setName(empDo.getName());
+	    empEntity.setDepartment(empDo.getDepartment());
+	    empEntity.setGender(empDo.getGender());
+	    empEntity.setImagePath(empDo.getImagePath());
+	    empEntity.setSalary(empDo.getSalary());
+	    empEntity.setNotes(empDo.getNotes());
+	    empEntity.setStartDate(new Date());
+	    return empEntity;
+	  }
+
 
 }

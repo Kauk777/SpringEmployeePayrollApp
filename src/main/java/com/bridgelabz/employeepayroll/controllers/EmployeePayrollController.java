@@ -15,44 +15,42 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bridgelabz.employeepayroll.models.EmployeeDO;
+import com.bridgelabz.employeepayroll.models.EmployeeDTO;
 import com.bridgelabz.employeepayroll.models.EmployeeEntity;
-import com.bridgelabz.employeepayroll.models.ResponseDAO;
+import com.bridgelabz.employeepayroll.models.ResponseDTO;
 import com.bridgelabz.employeepayroll.service.IEmployeePayrollService;
 
 @RestController
+@RequestMapping(value = "/employee")
 @CrossOrigin(origins = {"http://localhost:3000","http://localhost:8080"})
 public class EmployeePayrollController {
 	
 	@Autowired
 	private IEmployeePayrollService employeePayrollService;
 	
+	@GetMapping(value = {"/get"})
+	public ResponseEntity<List<EmployeeEntity>> getEmployeePayrollData() {
+		return new ResponseEntity<>(employeePayrollService.getEmployeeList(), HttpStatus.OK);
+	}
 	
-	 
-	 @GetMapping(value="/get")
-	 public ResponseEntity<List<EmployeeEntity>> getEmployeeList() {
-		 return new ResponseEntity<List<EmployeeEntity>>(employeePayrollService.getEmployeeList(),HttpStatus.OK);
-	 }
-	 
-	 @PostMapping(value = "/add")
-	 public ResponseEntity<ResponseDAO> addEmployee(@RequestBody EmployeeDO employeeDO) {
-		 return new ResponseEntity<ResponseDAO>(employeePayrollService.addEmployee(employeeDO), HttpStatus.OK);
-	 }
-	 
-	 @DeleteMapping(value = "/delete/{id}")
-	    public ResponseEntity<ResponseDAO> deleteEmplyoee(@PathVariable int id) {
-	        return new ResponseEntity<ResponseDAO>(employeePayrollService.deleteEmployee(id), HttpStatus.OK);
-	 }
-	 
-	 @GetMapping(value = "/get/{id}")
-	    public ResponseEntity<EmployeeDO> getEmployeeById(@PathVariable int id) {
-	        return new ResponseEntity<EmployeeDO>(employeePayrollService.getEmployeeByID(id), HttpStatus.OK);
-	 }
-	 
+	@PostMapping(value = {"/add"})
+	public ResponseEntity<ResponseDTO> addEmployee(@RequestBody EmployeeDTO employeeDTO) {
+		return new ResponseEntity<ResponseDTO>(employeePayrollService.addEmployee(employeeDTO), HttpStatus.OK);
+	}
+	
+	@DeleteMapping(value = "/delete/{id}")
+	public ResponseEntity<ResponseDTO> deleteEmployee(@PathVariable int id) {
+		return new ResponseEntity<ResponseDTO>(employeePayrollService.deleteEmployee(id) , HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/get/{id}")
+	public ResponseEntity<EmployeeEntity> findEmployeeById(@PathVariable int id) {
+		return new ResponseEntity<>(employeePayrollService.findEmployee(id), HttpStatus.OK);
+	}
+	
 	@PutMapping(value = "/update/{id}")
-	 public ResponseEntity<EmployeeDO> updateEmployeeData(@RequestBody EmployeeDO empData, @PathVariable int id) {
-		 return new ResponseEntity<EmployeeDO>(employeePayrollService.updateEmployeeById(empData,id), HttpStatus.OK);
-	 }
-	 
+	public ResponseEntity<EmployeeEntity> updateEmployee(@RequestBody EmployeeDTO employeeDTO, @PathVariable int id) {
+		return new ResponseEntity<>(employeePayrollService.updateEmployeeData(id, employeeDTO) , HttpStatus.OK);
+	}
 
 }
